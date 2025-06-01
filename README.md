@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧾 Slooze - Commodities Management System
 
-## Getting Started
+A comprehensive commodities management system built with Next.js, TypeScript, and modern web technologies. This application provides role-based access control for managing inventory, products, and supplies with both Manager and Store Keeper roles.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Role-Based Authentication**: Manager and Store Keeper roles with different permissions
+- **Product Management**: Full CRUD operations for commodity products
+- **Dark/Light Theme**: Seamless theme switching with persistence
+- **Responsive Design**: Mobile-first design following Figma specifications
+- **Real-time Updates**: Live data synchronization across the application
+- **Mock API**: Development-ready mock endpoints for testing
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **State Management**: Zustand
+- **API**: Axios with Mock Adapter (development)
+- **Charts**: Recharts
+- **Theme**: next-themes
+- **Icons**: Lucide React
+
+## 📦 Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd slooze
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🔐 Test Credentials
+
+The application comes with pre-configured test users:
+
+### Manager Account
+
+- **Email**: `manager@slooze.com`
+- **Password**: `manager123`
+- **Permissions**: Full access to dashboard and all features
+
+### Store Keeper Account
+
+- **Email**: `keeper@slooze.com`
+- **Password**: `keeper123`
+- **Permissions**: Limited access (no dashboard access)
+
+## 📁 Project Structure
+
+```
+slooze/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── layout.tsx         # Root layout with providers
+│   │   └── page.tsx           # Home page (setup test)
+│   ├── components/            # Reusable components
+│   │   ├── ui/                # shadcn/ui components
+│   │   ├── theme-provider.tsx # Theme context provider
+│   │   ├── theme-toggle.tsx   # Dark/light mode toggle
+│   │   └── mock-api-initializer.tsx # Mock API setup
+│   ├── constants/             # Application constants
+│   │   └── config.ts          # Configuration constants
+│   ├── lib/                   # Utility libraries
+│   │   ├── utils.ts           # General utilities
+│   │   └── api-mock.ts        # Mock API endpoints
+│   └── store/                 # Zustand state stores
+│       ├── auth-store.ts      # Authentication state
+│       └── products-store.ts  # Products state
+└── public/                   # Static assets
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎨 Design System
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application strictly follows Figma design specifications with:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Light & Dark Themes**: Pixel-perfect implementation of both themes
+- **Component Library**: shadcn/ui components styled to match designs
+- **Responsive Layout**: Mobile-first approach maintaining design integrity
+- **Color Palette**: Exact color matching from Figma specifications
 
-## Learn More
+## 🔧 Development
 
-To learn more about Next.js, take a look at the following resources:
+### Available Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Mock API Endpoints
 
-## Deploy on Vercel
+The development environment includes mock API endpoints:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `POST /api/auth/login` - User authentication
+- `GET /api/products` - Fetch all products
+- `POST /api/products` - Create new product
+- `PUT /api/products/:id` - Update product
+- `DELETE /api/products/:id` - Delete product
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### State Management
+
+The application uses Zustand for state management with two main stores:
+
+1. **Auth Store** (`useAuthStore`): Manages user authentication, login/logout, and session persistence
+2. **Products Store** (`useProductsStore`): Handles product data, CRUD operations, and filtering
