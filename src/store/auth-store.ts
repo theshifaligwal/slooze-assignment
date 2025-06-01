@@ -30,6 +30,34 @@ interface AuthActions {
 
 type AuthStore = AuthState & AuthActions;
 
+// Helper function to create a JWT-like token for middleware
+function createToken(user: User): string {
+  const header = btoa(JSON.stringify({ alg: "none", typ: "JWT" }));
+  const payload = btoa(
+    JSON.stringify({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
+    })
+  );
+  return `${header}.${payload}.signature`;
+}
+
+// Helper function to set cookie
+function setCookie(name: string, value: string, days: number = 1) {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;samesite=lax`;
+}
+
+// Helper function to delete cookie
+function deleteCookie(name: string) {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+}
+
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
@@ -48,9 +76,17 @@ export const useAuthStore = create<AuthStore>()(
           const response = await api.post("/auth/login", { email, password });
           const data = response.data;
 
+          // Create a proper token for middleware
+          const token = createToken(data.user);
+
+          // Set cookie for middleware access
+          if (typeof window !== "undefined") {
+            setCookie(AUTH_CONFIG.tokenKey, token);
+          }
+
           set({
             user: data.user,
-            token: data.token,
+            token,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -80,6 +116,11 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: () => {
+        // Delete cookie
+        if (typeof window !== "undefined") {
+          deleteCookie(AUTH_CONFIG.tokenKey);
+        }
+
         set({
           user: null,
           token: null,
@@ -93,6 +134,10 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       setToken: (token: string) => {
+        // Update cookie when token changes
+        if (typeof window !== "undefined") {
+          setCookie(AUTH_CONFIG.tokenKey, token);
+        }
         set({ token });
       },
 
@@ -115,6 +160,12 @@ export const useAuthStore = create<AuthStore>()(
         token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Sync cookie on rehydration
+        if (state?.token && typeof window !== "undefined") {
+          setCookie(AUTH_CONFIG.tokenKey, state.token);
+        }
+      },
     }
   )
 );
