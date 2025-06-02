@@ -40,9 +40,9 @@ interface FormErrors {
 }
 
 interface EditProductPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditProductPage({ params }: EditProductPageProps) {
@@ -50,6 +50,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const { products, updateProduct, isLoading, fetchProducts } =
     useProductsStore();
 
+  const [productId, setProductId] = useState<string>("");
   const [product, setProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -99,12 +100,23 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   ];
 
   useEffect(() => {
+    const initializeComponent = async () => {
+      const resolvedParams = await params;
+      setProductId(resolvedParams.id);
+    };
+
+    initializeComponent();
+  }, [params]);
+
+  useEffect(() => {
     const loadProduct = async () => {
+      if (!productId) return;
+
       if (products.length === 0) {
         await fetchProducts();
       }
 
-      const foundProduct = products.find((p) => p.id === params.id);
+      const foundProduct = products.find((p) => p.id === productId);
 
       if (foundProduct) {
         setProduct(foundProduct);
@@ -124,7 +136,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     };
 
     loadProduct();
-  }, [params.id, products, fetchProducts]);
+  }, [productId, products, fetchProducts]);
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
