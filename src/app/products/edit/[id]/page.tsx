@@ -233,7 +233,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <span className="ml-2 text-gray-600 dark:text-gray-400">
             Loading product...
           </span>
@@ -246,7 +246,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     return (
       <DashboardLayout>
         <div className="text-center py-12">
-          <AlertCircle className="mx-auto h-12 w-12 text-red-500" />
+          <AlertCircle className="mx-auto h-12 w-12 text-red-500 dark:text-red-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
             Product not found
           </h3>
@@ -269,11 +269,15 @@ export default function EditProductPage({ params }: EditProductPageProps) {
 
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6 p-6">
         {/* Header */}
         <div className="flex items-center gap-4">
           <Link href="/products">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Products
             </Button>
@@ -290,9 +294,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
-          <Card>
+          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                 <Package className="h-5 w-5" />
                 Basic Information
               </CardTitle>
@@ -300,13 +304,20 @@ export default function EditProductPage({ params }: EditProductPageProps) {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Product Name *</Label>
+                  <Label
+                    htmlFor="name"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    Product Name *
+                  </Label>
                   <Input
                     id="name"
                     placeholder="Enter product name"
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
-                    className={errors.name ? "border-red-500" : ""}
+                    className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                      errors.name ? "border-red-500 dark:border-red-400" : ""
+                    }`}
                   />
                   {errors.name && (
                     <p className="text-sm text-red-600 dark:text-red-400">
@@ -316,7 +327,12 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="category">Category *</Label>
+                  <Label
+                    htmlFor="category"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    Category *
+                  </Label>
                   <Select
                     value={formData.category}
                     onValueChange={(value) =>
@@ -324,13 +340,24 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     }
                   >
                     <SelectTrigger
-                      className={errors.category ? "border-red-500" : ""}
+                      className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white ${
+                        errors.category
+                          ? "border-red-500 dark:border-red-400"
+                          : ""
+                      }`}
                     >
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue
+                        placeholder="Select category"
+                        className="text-gray-500 dark:text-gray-400"
+                      />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
                       {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
+                        <SelectItem
+                          key={category}
+                          value={category}
+                          className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
                           {category}
                         </SelectItem>
                       ))}
@@ -345,7 +372,12 @@ export default function EditProductPage({ params }: EditProductPageProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label
+                  htmlFor="description"
+                  className="text-gray-700 dark:text-gray-300"
+                >
+                  Description
+                </Label>
                 <Textarea
                   id="description"
                   placeholder="Enter product description (optional)"
@@ -354,20 +386,28 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     handleInputChange("description", e.target.value)
                   }
                   rows={3}
+                  className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
             </CardContent>
           </Card>
 
           {/* Pricing & Inventory */}
-          <Card>
+          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <CardHeader>
-              <CardTitle>Pricing & Inventory</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">
+                Pricing & Inventory
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price ($) *</Label>
+                  <Label
+                    htmlFor="price"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    Price ($) *
+                  </Label>
                   <Input
                     id="price"
                     type="number"
@@ -376,7 +416,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     placeholder="0.00"
                     value={formData.price}
                     onChange={(e) => handleInputChange("price", e.target.value)}
-                    className={errors.price ? "border-red-500" : ""}
+                    className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                      errors.price ? "border-red-500 dark:border-red-400" : ""
+                    }`}
                   />
                   {errors.price && (
                     <p className="text-sm text-red-600 dark:text-red-400">
@@ -386,7 +428,12 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="quantity">Quantity *</Label>
+                  <Label
+                    htmlFor="quantity"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    Quantity *
+                  </Label>
                   <Input
                     id="quantity"
                     type="number"
@@ -396,7 +443,11 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     onChange={(e) =>
                       handleInputChange("quantity", e.target.value)
                     }
-                    className={errors.quantity ? "border-red-500" : ""}
+                    className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                      errors.quantity
+                        ? "border-red-500 dark:border-red-400"
+                        : ""
+                    }`}
                   />
                   {errors.quantity && (
                     <p className="text-sm text-red-600 dark:text-red-400">
@@ -406,19 +457,33 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="unit">Unit *</Label>
+                  <Label
+                    htmlFor="unit"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    Unit *
+                  </Label>
                   <Select
                     value={formData.unit}
                     onValueChange={(value) => handleInputChange("unit", value)}
                   >
                     <SelectTrigger
-                      className={errors.unit ? "border-red-500" : ""}
+                      className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white ${
+                        errors.unit ? "border-red-500 dark:border-red-400" : ""
+                      }`}
                     >
-                      <SelectValue placeholder="Select unit" />
+                      <SelectValue
+                        placeholder="Select unit"
+                        className="text-gray-500 dark:text-gray-400"
+                      />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600">
                       {units.map((unit) => (
-                        <SelectItem key={unit} value={unit}>
+                        <SelectItem
+                          key={unit}
+                          value={unit}
+                          className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
                           {unit}
                         </SelectItem>
                       ))}
@@ -435,14 +500,21 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           </Card>
 
           {/* Supplier & Additional Info */}
-          <Card>
+          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <CardHeader>
-              <CardTitle>Supplier & Additional Information</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">
+                Supplier & Additional Information
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="supplier">Supplier *</Label>
+                  <Label
+                    htmlFor="supplier"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    Supplier *
+                  </Label>
                   <Input
                     id="supplier"
                     placeholder="Enter supplier name"
@@ -450,7 +522,11 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     onChange={(e) =>
                       handleInputChange("supplier", e.target.value)
                     }
-                    className={errors.supplier ? "border-red-500" : ""}
+                    className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 ${
+                      errors.supplier
+                        ? "border-red-500 dark:border-red-400"
+                        : ""
+                    }`}
                   />
                   {errors.supplier && (
                     <p className="text-sm text-red-600 dark:text-red-400">
@@ -460,7 +536,12 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="expiryDate">Expiry Date</Label>
+                  <Label
+                    htmlFor="expiryDate"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    Expiry Date
+                  </Label>
                   <Input
                     id="expiryDate"
                     type="date"
@@ -468,6 +549,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                     onChange={(e) =>
                       handleInputChange("expiryDate", e.target.value)
                     }
+                    className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -475,18 +557,24 @@ export default function EditProductPage({ params }: EditProductPageProps) {
           </Card>
 
           {/* Product Metadata */}
-          <Card>
+          <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <CardHeader>
-              <CardTitle>Product Information</CardTitle>
+              <CardTitle className="text-gray-900 dark:text-white">
+                Product Information
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <div>
-                  <span className="font-medium">Created:</span>{" "}
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    Created:
+                  </span>{" "}
                   {new Date(product.createdAt).toLocaleDateString()}
                 </div>
                 <div>
-                  <span className="font-medium">Last Updated:</span>{" "}
+                  <span className="font-medium text-gray-700 dark:text-gray-300">
+                    Last Updated:
+                  </span>{" "}
                   {new Date(product.updatedAt).toLocaleDateString()}
                 </div>
               </div>
@@ -500,6 +588,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
               variant="outline"
               onClick={handleReset}
               disabled={isSubmitting}
+              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               Reset Changes
             </Button>
