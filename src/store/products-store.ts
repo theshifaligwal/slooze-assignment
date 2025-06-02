@@ -11,6 +11,7 @@ export interface Product {
   supplier: string;
   description?: string;
   expiryDate?: string;
+  status: "published" | "draft";
   createdAt: string;
   updatedAt: string;
 }

@@ -154,6 +154,7 @@ export default function AddProductPage() {
         supplier: formData.supplier.trim(),
         description: formData.description.trim() || undefined,
         expiryDate: formData.expiryDate || undefined,
+        status: "draft",
       });
 
       router.push("/products");

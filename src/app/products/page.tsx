@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,174 +37,11 @@ import {
   CheckCircle,
   Info,
   AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-
-// Sample product data to match the Figma design
-interface SampleProduct {
-  id: string;
-  name: string;
-  image: string;
-  views: string;
-  pricing: string;
-  revenue: string;
-  manager: string;
-  status: "published" | "draft";
-}
-
-const initialProducts: SampleProduct[] = [
-  {
-    id: "1",
-    name: "iPhone 12 Pro",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-  {
-    id: "2",
-    name: "MacBook Pro 2023",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-  {
-    id: "3",
-    name: "MacBook Pro 2023",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "draft",
-  },
-  {
-    id: "4",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-  {
-    id: "5",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "draft",
-  },
-  {
-    id: "6",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-  {
-    id: "7",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "draft",
-  },
-  {
-    id: "8",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-  {
-    id: "9",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-  {
-    id: "10",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "draft",
-  },
-  {
-    id: "11",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-  {
-    id: "12",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-  {
-    id: "13",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "draft",
-  },
-  {
-    id: "14",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-  {
-    id: "15",
-    name: "Product Name Place Here",
-    image: "/api/placeholder/40/40",
-    views: "14,000",
-    pricing: "$1,000",
-    revenue: "$164,000",
-    manager: "Edit",
-    status: "published",
-  },
-];
+import { useProductsStore, Product } from "@/store/products-store";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -220,26 +57,62 @@ interface Notification {
 export default function ProductsPage() {
   const router = useRouter();
 
-  // State management
-  const [products, setProducts] = useState<SampleProduct[]>(initialProducts);
+  // Store data
+  const {
+    products,
+    isLoading,
+    error,
+    fetchProducts,
+    deleteProduct,
+    updateProduct,
+  } = useProductsStore();
+
+  // Local state management
   const [activeTab, setActiveTab] = useState<"published" | "draft">(
     "published"
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [productToDelete, setProductToDelete] = useState<SampleProduct | null>(
-    null
-  );
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(
     new Set()
   );
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortColumn, setSortColumn] = useState<keyof SampleProduct>("name");
+  const [sortColumn, setSortColumn] = useState<keyof Product>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   // Notification modal state
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notification, setNotification] = useState<Notification | null>(null);
+
+  // Load products on mount
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  // Show notification modal
+  const showNotification = (
+    type: NotificationType,
+    title: string,
+    description: string
+  ) => {
+    setNotification({ type, title, description });
+    setNotificationOpen(true);
+  };
+
+  // Get notification icon based on type
+  const getNotificationIcon = (type: NotificationType) => {
+    switch (type) {
+      case "success":
+        return <CheckCircle className="h-6 w-6 text-green-500" />;
+      case "info":
+        return <Info className="h-6 w-6 text-blue-500" />;
+      case "warning":
+        return <AlertTriangle className="h-6 w-6 text-yellow-500" />;
+      case "error":
+        return <AlertTriangle className="h-6 w-6 text-red-500" />;
+    }
+  };
 
   // Filter and paginate products
   const filteredAndSortedProducts = useMemo(() => {
@@ -251,8 +124,8 @@ export default function ProductsPage() {
 
     // Sort products
     filtered.sort((a, b) => {
-      const aValue = a[sortColumn];
-      const bValue = b[sortColumn];
+      const aValue = String(a[sortColumn]);
+      const bValue = String(b[sortColumn]);
       const direction = sortDirection === "asc" ? 1 : -1;
       return aValue.localeCompare(bValue) * direction;
     });
@@ -269,15 +142,16 @@ export default function ProductsPage() {
     startIndex + ITEMS_PER_PAGE
   );
 
-  const handleDeleteClick = (product: SampleProduct) => {
+  const handleDeleteClick = (product: Product) => {
     setProductToDelete(product);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (productToDelete) {
-      // Actually remove the product from state
-      setProducts((prev) => prev.filter((p) => p.id !== productToDelete.id));
+    if (!productToDelete) return;
+
+    try {
+      await deleteProduct(productToDelete.id);
 
       // Remove from selected products if it was selected
       setSelectedProducts((prev) => {
@@ -286,7 +160,6 @@ export default function ProductsPage() {
         return newSet;
       });
 
-      // Show success notification
       showNotification(
         "success",
         "Product deleted",
@@ -294,31 +167,30 @@ export default function ProductsPage() {
       );
 
       // Adjust current page if needed
-      const newFilteredProducts = products.filter(
-        (p) =>
-          p.id !== productToDelete.id &&
-          p.status === activeTab &&
-          p.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
       const newTotalPages = Math.ceil(
-        newFilteredProducts.length / ITEMS_PER_PAGE
+        (filteredAndSortedProducts.length - 1) / ITEMS_PER_PAGE
       );
       if (currentPage > newTotalPages && newTotalPages > 0) {
         setCurrentPage(newTotalPages);
       }
+    } catch {
+      showNotification(
+        "error",
+        "Delete failed",
+        "Failed to delete the product. Please try again."
+      );
     }
+
     setDeleteDialogOpen(false);
     setProductToDelete(null);
   };
 
   const handleEditClick = (productId: string) => {
-    // Navigate to edit page
     router.push(`/products/edit/${productId}`);
   };
 
   const handleAddProduct = () => {
     try {
-      // Navigate to add product page
       router.push("/products/add");
     } catch (error) {
       console.error("Navigation error:", error);
@@ -350,7 +222,7 @@ export default function ProductsPage() {
     }
   };
 
-  const handleSort = (column: keyof SampleProduct) => {
+  const handleSort = (column: keyof Product) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -359,47 +231,51 @@ export default function ProductsPage() {
     }
   };
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     const selectedCount = selectedProducts.size;
+    const selectedIds = Array.from(selectedProducts);
 
-    // Remove selected products
-    setProducts((prev) => prev.filter((p) => !selectedProducts.has(p.id)));
-    setSelectedProducts(new Set());
+    try {
+      // Delete all selected products
+      await Promise.all(selectedIds.map((id) => deleteProduct(id)));
 
-    showNotification(
-      "success",
-      "Products deleted",
-      `${selectedCount} product${
-        selectedCount > 1 ? "s" : ""
-      } deleted successfully.`
-    );
+      setSelectedProducts(new Set());
+      showNotification(
+        "success",
+        "Products deleted",
+        `${selectedCount} product${
+          selectedCount > 1 ? "s" : ""
+        } deleted successfully.`
+      );
 
-    // Adjust current page if needed
-    const newFilteredProducts = products.filter(
-      (p) =>
-        !selectedProducts.has(p.id) &&
-        p.status === activeTab &&
-        p.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    const newTotalPages = Math.ceil(
-      newFilteredProducts.length / ITEMS_PER_PAGE
-    );
-    if (currentPage > newTotalPages && newTotalPages > 0) {
-      setCurrentPage(newTotalPages);
+      // Adjust current page if needed
+      const newTotalPages = Math.ceil(
+        (filteredAndSortedProducts.length - selectedCount) / ITEMS_PER_PAGE
+      );
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      }
+    } catch {
+      showNotification(
+        "error",
+        "Bulk delete failed",
+        "Failed to delete some products. Please try again."
+      );
     }
   };
 
   const handleDownload = (format: string) => {
-    // Simulate download functionality
+    // Generate data for download
     const dataToDownload = filteredAndSortedProducts.map((product) => ({
       name: product.name,
-      views: product.views,
-      pricing: product.pricing,
-      revenue: product.revenue,
+      category: product.category,
+      price: `$${product.price}`,
+      quantity: product.quantity,
+      unit: product.unit,
+      supplier: product.supplier,
       status: product.status,
     }));
 
-    // Show success notification
     showNotification(
       "success",
       "Download started",
@@ -416,15 +292,15 @@ export default function ProductsPage() {
   const handleFilter = (filterType: string) => {
     switch (filterType) {
       case "price-high":
-        setSortColumn("pricing");
+        setSortColumn("price");
         setSortDirection("desc");
         break;
       case "price-low":
-        setSortColumn("pricing");
+        setSortColumn("price");
         setSortDirection("asc");
         break;
-      case "views-high":
-        setSortColumn("views");
+      case "quantity-high":
+        setSortColumn("quantity");
         setSortDirection("desc");
         break;
       default:
@@ -450,33 +326,30 @@ export default function ProductsPage() {
   const handleTabChange = (tab: "published" | "draft") => {
     setActiveTab(tab);
     setCurrentPage(1);
-    setSelectedProducts(new Set()); // Clear selections when changing tabs
-    setSearchTerm(""); // Clear search when changing tabs
+    setSelectedProducts(new Set());
+    setSearchTerm("");
   };
 
-  const handleStatusToggle = (productId: string) => {
-    setProducts((prev) =>
-      prev.map((product) =>
-        product.id === productId
-          ? {
-              ...product,
-              status:
-                product.status === "published"
-                  ? "draft"
-                  : ("published" as "published" | "draft"),
-            }
-          : product
-      )
-    );
-
+  const handleStatusToggle = async (productId: string) => {
     const product = products.find((p) => p.id === productId);
-    const newStatus = product?.status === "published" ? "draft" : "published";
+    if (!product) return;
 
-    showNotification(
-      "success",
-      "Status updated",
-      `"${product?.name}" is now ${newStatus}`
-    );
+    const newStatus = product.status === "published" ? "draft" : "published";
+
+    try {
+      await updateProduct(productId, { status: newStatus });
+      showNotification(
+        "success",
+        "Status updated",
+        `"${product.name}" is now ${newStatus}`
+      );
+    } catch {
+      showNotification(
+        "error",
+        "Update failed",
+        "Failed to update product status. Please try again."
+      );
+    }
   };
 
   // Chart component for the sidebar
@@ -507,7 +380,6 @@ export default function ProductsPage() {
             </div>
           </div>
           <div className="h-20 relative">
-            {/* Simple chart representation */}
             <svg className="w-full h-full" viewBox="0 0 300 80">
               <path
                 d="M0,60 Q75,40 150,45 T300,35"
@@ -551,29 +423,43 @@ export default function ProductsPage() {
     selectedProducts.has(p.id)
   );
 
-  // Show notification modal
-  const showNotification = (
-    type: NotificationType,
-    title: string,
-    description: string
-  ) => {
-    setNotification({ type, title, description });
-    setNotificationOpen(true);
-  };
+  // Calculate stats from actual data
+  const totalQuantity = products.reduce((sum, p) => sum + p.quantity, 0);
+  const totalValue = products.reduce((sum, p) => sum + p.price * p.quantity, 0);
 
-  // Get notification icon based on type
-  const getNotificationIcon = (type: NotificationType) => {
-    switch (type) {
-      case "success":
-        return <CheckCircle className="h-6 w-6 text-green-500" />;
-      case "info":
-        return <Info className="h-6 w-6 text-blue-500" />;
-      case "warning":
-        return <AlertTriangle className="h-6 w-6 text-yellow-500" />;
-      case "error":
-        return <AlertTriangle className="h-6 w-6 text-red-500" />;
-    }
-  };
+  // Show loading state
+  if (isLoading && products.length === 0) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
+          <span className="text-gray-600 dark:text-gray-400">
+            Loading products...
+          </span>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show error state
+  if (error && products.length === 0) {
+    return (
+      <DashboardLayout>
+        <div className="text-center py-12">
+          <AlertTriangle className="mx-auto h-12 w-12 text-red-500 dark:text-red-400" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+            Failed to load products
+          </h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {error}
+          </p>
+          <div className="mt-6">
+            <Button onClick={() => fetchProducts()}>Try Again</Button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -634,7 +520,7 @@ export default function ProductsPage() {
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
-                    setCurrentPage(1); // Reset to first page when searching
+                    setCurrentPage(1);
                   }}
                   className="pl-10 w-80 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
                 />
@@ -657,8 +543,10 @@ export default function ProductsPage() {
                   <DropdownMenuItem onClick={() => handleFilter("price-low")}>
                     Price: Low to High
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleFilter("views-high")}>
-                    Views: High to Low
+                  <DropdownMenuItem
+                    onClick={() => handleFilter("quantity-high")}
+                  >
+                    Quantity: High to Low
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={clearFilters}>
                     Clear Filters
@@ -670,7 +558,11 @@ export default function ProductsPage() {
                   variant="destructive"
                   size="sm"
                   onClick={handleBulkDelete}
+                  disabled={isLoading}
                 >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : null}
                   Delete Selected ({selectedProducts.size})
                 </Button>
               )}
@@ -734,13 +626,13 @@ export default function ProductsPage() {
                     </TableHead>
                     <TableHead
                       className="text-gray-600 dark:text-gray-400 font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white"
-                      onClick={() => handleSort("views")}
+                      onClick={() => handleSort("category")}
                     >
-                      Views
+                      Category
                       <TrendingUp
                         className={cn(
                           "h-4 w-4 inline ml-1 transition-transform",
-                          sortColumn === "views" &&
+                          sortColumn === "category" &&
                             sortDirection === "desc" &&
                             "rotate-180"
                         )}
@@ -748,13 +640,13 @@ export default function ProductsPage() {
                     </TableHead>
                     <TableHead
                       className="text-gray-600 dark:text-gray-400 font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white"
-                      onClick={() => handleSort("pricing")}
+                      onClick={() => handleSort("price")}
                     >
-                      Pricing
+                      Price
                       <TrendingUp
                         className={cn(
                           "h-4 w-4 inline ml-1 transition-transform",
-                          sortColumn === "pricing" &&
+                          sortColumn === "price" &&
                             sortDirection === "desc" &&
                             "rotate-180"
                         )}
@@ -762,13 +654,13 @@ export default function ProductsPage() {
                     </TableHead>
                     <TableHead
                       className="text-gray-600 dark:text-gray-400 font-medium cursor-pointer hover:text-gray-900 dark:hover:text-white"
-                      onClick={() => handleSort("revenue")}
+                      onClick={() => handleSort("quantity")}
                     >
-                      Revenue
+                      Quantity
                       <TrendingUp
                         className={cn(
                           "h-4 w-4 inline ml-1 transition-transform",
-                          sortColumn === "revenue" &&
+                          sortColumn === "quantity" &&
                             sortDirection === "desc" &&
                             "rotate-180"
                         )}
@@ -838,13 +730,13 @@ export default function ProductsPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-gray-600 dark:text-gray-400">
-                          {product.views}
+                          {product.category}
                         </TableCell>
                         <TableCell className="text-gray-600 dark:text-gray-400">
-                          {product.pricing}
+                          ${product.price.toLocaleString()}
                         </TableCell>
                         <TableCell className="text-gray-600 dark:text-gray-400">
-                          {product.revenue}
+                          {product.quantity.toLocaleString()} {product.unit}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
@@ -861,6 +753,7 @@ export default function ProductsPage() {
                               size="sm"
                               onClick={() => handleStatusToggle(product.id)}
                               className="text-secondary-foreground hover:text-secondary-foreground/80 p-0 h-auto font-normal"
+                              disabled={isLoading}
                             >
                               {product.status === "published"
                                 ? "Unpublish"
@@ -871,6 +764,7 @@ export default function ProductsPage() {
                               size="sm"
                               onClick={() => handleDeleteClick(product)}
                               className="text-destructive hover:text-destructive/80 p-0 h-auto font-normal"
+                              disabled={isLoading}
                             >
                               Delete
                             </Button>
@@ -956,27 +850,20 @@ export default function ProductsPage() {
           </h2>
 
           <ChartComponent
-            title="Total Views"
-            value={products
-              .reduce((sum, p) => sum + parseInt(p.views.replace(",", "")), 0)
-              .toLocaleString()}
+            title="Total Quantity"
+            value={totalQuantity.toLocaleString()}
             color="#fbbf24"
           />
 
           <ChartComponent
-            title="Total Sales"
+            title="Total Products"
             value={products.length.toLocaleString()}
             color="#3b82f6"
           />
 
           <ChartComponent
-            title="Total Earning"
-            value={`$${products
-              .reduce(
-                (sum, p) => sum + parseInt(p.revenue.replace(/[$,]/g, "")),
-                0
-              )
-              .toLocaleString()}`}
+            title="Total Value"
+            value={`$${totalValue.toLocaleString()}`}
             color="#10b981"
           />
         </div>
@@ -996,11 +883,23 @@ export default function ProductsPage() {
             <Button
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
-              Delete
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

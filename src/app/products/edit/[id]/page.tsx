@@ -203,6 +203,7 @@ export default function EditProductPage({ params }: EditProductPageProps) {
         supplier: formData.supplier.trim(),
         description: formData.description.trim() || undefined,
         expiryDate: formData.expiryDate || undefined,
+        status: product.status,
       });
 
       router.push("/products");

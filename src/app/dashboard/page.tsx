@@ -646,9 +646,7 @@ export default function DashboardPage() {
                     >
                       Previous
                     </Button>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                      Next
-                    </Button>
+                    <Button size="sm">Next</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -693,9 +691,7 @@ export default function DashboardPage() {
                     >
                       Previous
                     </Button>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                      Next
-                    </Button>
+                    <Button size="sm">Next</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -838,9 +834,7 @@ export default function DashboardPage() {
                         placeholder="Enter Your Email Here"
                         className="rounded-r-none border-gray-300 dark:border-gray-600"
                       />
-                      <Button className="rounded-l-none bg-blue-600 hover:bg-blue-700 text-white">
-                        Subscribe
-                      </Button>
+                      <Button className="rounded-l-none">Subscribe</Button>
                     </div>
                   </div>
                   <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
