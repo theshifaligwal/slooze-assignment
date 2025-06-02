@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth-store";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -30,12 +31,15 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
+  const router = useRouter();
   const { user, logout } = useAuthStore();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
+    // Redirect to login page after logout
+    router.push(ROUTES.login);
   };
 
   const navigation = [
